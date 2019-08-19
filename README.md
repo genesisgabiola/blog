@@ -1,0 +1,28 @@
+# Blog
+
+A simple and temporary blog for my website.
+
+## Built with:
+- HTML5
+- CSS3
+- Bootstrap
+- Node
+- Express
+- EJS
+
+<!-- ![Blog Screenshot](public/img/screenshot.png "Blog Screenshot") -->
+
+<!-- Visit the [live preview](https://genesisgabiola.github.io/blog). -->
+
+## Future Improvements:
+
+- [ ] Improve the UI and UX.
+- [ ] Add some more content.
+- [ ] Add a database to store the items.
+
+## How to Contribute?
+
+- Open an issue [here](https://github.com/genesisgabiola/blog/issues).
+- Contact me on [twitter](http://twitter.com/genesisgabiola).
+
+Any queries, suggestions, issues to report or critics are welcome :) You can freely connect to me.
