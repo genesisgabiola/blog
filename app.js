@@ -1,5 +1,6 @@
 const express = require('express');
 const bodyParser = require('body-parser');
+const mongoose = require('mongoose');
 const ejs = require('ejs');
 const _ = require('lodash');
 
@@ -9,18 +10,70 @@ const contactContent = 'Scelerisque eleifend donec pretium vulputate sapien. Rho
 
 const app = express();
 const PORT = process.env.PORT || 3000;
-const posts = [];
+const DB = process.env.DATABASEURL || 'mongodb://localhost:27017/blogDB';
 
 app.set('view engine', 'ejs');
 
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(express.static('public'));
 
+mongoose.connect(DB, { useNewUrlParser: true });
+
+const postSchema = {
+  title: String,
+  content: String
+};
+
+const Post = mongoose.model('Post', postSchema);
 
 app.get('/', function(req, res) {
-  res.render('home', {
-    StartingContent: homeStartingContent,
-    posts: posts
+  Post.find({}, function(err, posts) {
+    res.render('home', {
+      StartingContent: homeStartingContent,
+      posts: posts
+    });
+  });
+});
+
+app.get('/compose', function(req, res) {
+  res.render('compose');
+});
+
+app.post('/compose', function(req, res) {
+  const post = new Post ({
+    title: req.body.postTitle,
+    content: req.body.postBody
+  });
+  
+  post.save(function(err) {
+    if (!err) {
+      res.redirect('/');
+    }
+  });
+});
+
+// app.get('/posts/:post', function(req, res) {
+//   const requestedTitle = _.lowerCase(req.params.post);
+  
+//   posts.forEach(function(post) {
+//     const storedTitle = _.lowerCase(post.title);
+//     if (storedTitle === requestedTitle) {
+//       res.render('post', {
+//         title: post.title,
+//         content: post.content
+//       });
+//     }
+//   });
+// });
+
+app.get('/posts/:postId', function(req, res) {
+  const requestedPostId = req.params.postId;
+
+  Post.findOne({_id: requestedPostId}, function(err, post) {
+    res.render('post', {
+      title: post.title,
+      content: post.content
+    });
   });
 });
 
@@ -30,36 +83,6 @@ app.get('/about', function(req, res) {
 
 app.get('/contact', function(req, res) {
   res.render('contact', { contactContent: contactContent });
-});
-
-app.get('/compose', function(req, res) {
-  res.render('compose');
-});
-
-app.post('/compose', function(req, res) {
-  const post = {
-    title: req.body.postTitle,
-    content: req.body.postBody
-  }
-
-  posts.push(post);
-  res.redirect('/');
-});
-
-app.get('/posts/:post', function(req, res) {
-  // res.send(req.params);
-  const requestedTitle = _.lowerCase(req.params.post);
-
-  posts.forEach(function(post) {
-    const storedTitle = _.lowerCase(post.title);
-    if (storedTitle === requestedTitle) {
-      // console.log('Matched');
-      res.render('post', {
-        title: post.title,
-        content: post.content
-      });
-    }
-  });
 });
 
 app.listen(PORT, function() {
